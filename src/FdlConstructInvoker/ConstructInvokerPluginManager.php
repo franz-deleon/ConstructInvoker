@@ -3,10 +3,12 @@ namespace FdlConstructInvoker;
 
 class ConstructInvokerPluginManager extends ServiceManager\AbstractFdlPluginManager
 {
+    /**
+     * Validates the invokable
+     * @see Zend\ServiceManager.AbstractPluginManager::validatePlugin()
+     */
     public function validatePlugin($plugin)
     {
-        if (!method_exists($plugin, '__construct')) {
-            throw new \ErrorException('Only accept objects with constructors');
-        }
+        // already validated in AbstractFdlPluginManager so do nothing
     }
 }

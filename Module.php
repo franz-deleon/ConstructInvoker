@@ -9,10 +9,12 @@ class Module
 {
     public function init($moduleManager)
     {
-        $sm = $moduleManager->getEvent()->getParam('ServiceManager');
-        $serviceListener = $sm->get('ServiceListener');
-        $serviceListener->addServiceManager(
-            'constructInvokerPluginManager',
+        $listener = $moduleManager->getEvent()
+                                  ->getParam('ServiceManager')
+                                  ->get('ServiceListener');
+
+        $listener->addServiceManager(
+            'constructInvokerPlugin',
             'construct_invoker_config',
             'FdlConstructInvoker\ConstructInvokerPluginProviderInterface',
             'getConstructInvokerConfig'
@@ -39,7 +41,7 @@ class Module
     {
         return array(
             'factories' => array(
-                'constructInvokerPluginManager' => 'FdlConstructInvoker\ConstructInvokerPluginFactory',
+                'constructInvokerPlugin' => 'FdlConstructInvoker\ConstructInvokerPluginFactory',
             ),
         );
     }

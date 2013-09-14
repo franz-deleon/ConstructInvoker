@@ -1,19 +1,18 @@
 <?php
 namespace FdlConstructInvoker\ServiceManager;
 
+use FdlConstructInvoker\ConstructBuilder;
+
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception;
 
 abstract class AbstractFdlPluginManager extends AbstractPluginManager
 {
     /**
-     * The invokable class
-     * @var string
-     */
-    protected $invokable;
-
-    /**
-     * We override the createFromInvokable to use our own
+     * We override the createFromInvokable method to use our own
+     * and delegate the job to builder constructor.
      *
+     * @override
      * @param  string $canonicalName
      * @param  string $requestedName
      * @return null|\stdClass
@@ -32,34 +31,8 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
             ));
         }
 
-        $this->invokable = $invokable;
-
-        return $this;
-    }
-
-    /**
-     * We invoke our object here using eval
-     *
-     * @param void
-     * @return null
-     */
-    public function construct()
-    {
-        $args = func_get_args();
-
-        // convert to string
-        $evalArgs = array();
-        foreach ($args as $key => $arg) {
-            $evalArgs["arg{$key}"] = $arg;
-        }
-        unset($args);
-        extract($evalArgs);
-
-        // we can only use eval and hack our way to it :[
-        $args = implode(', $', array_keys($evalArgs));
-        $args = (!empty($args)) ? '$' . $args : '';
-        eval("\$instance = new \$this->invokable($args);");
-
-        return $instance;
+        // Delegate the instantiation of the invokable
+        // This prevents recursion of the service manager
+        return new ConstructBuilder($invokable);
     }
 }
