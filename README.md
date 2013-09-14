@@ -1,7 +1,10 @@
 FdlConstructInvoker
 ===============
 
-This is a ZF2 module to enable passing of arguments to constructors using invokable classes.
+This is a ZF2 module to enable passing of arguments to constructors at invoke time with invokable classes.
+
+        $this->getServiceLocator()->get('MyInvokableClass')->construct($firstArg, $secondArg, [...]);
+
 
 INSTALLATION:
 -------------
