@@ -17,11 +17,6 @@ class Module
             'FdlConstructInvoker\ConstructInvokerPluginProviderInterface',
             'getConstructInvokerConfig'
         );
-        //$serviceManager = $moduleManager->getEvent()->getParam('ServiceManager');
-
-        //$fdlServiceManager = new FdlServiceManager();
-        //$serviceManager->addPeeringServiceManager($fdlServiceManager);
-        //$serviceManager->setRetrieveFromPeeringManagerFirst(true);
     }
 
     public function getConfig()
