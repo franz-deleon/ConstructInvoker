@@ -48,6 +48,7 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
         $args = func_get_args();
 
         // convert to string
+        $evalArgs = array();
         foreach ($args as $key => $arg) {
             $evalArgs["arg{$key}"] = $arg;
         }
