@@ -55,7 +55,8 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
         extract($evalArgs);
 
         // we can only use eval and hack our way to it :[
-        $args = '$' . implode(', $', array_keys($evalArgs));
+        $args = implode(', $', array_keys($evalArgs));
+        $args = (!empty($args)) ? '$' . $args : '';
         eval("\$instance = new \$this->invokable($args);");
 
         return $instance;
