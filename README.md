@@ -1,21 +1,25 @@
 FdlConstructInvoker
 ===============
 
-This is a ZF2 module to enable passing of arguments to constructors at invoke time with invokable classes.
+A ZF2 module that enables argument passing to class constructors (`__construct()`) that
+requires or does not require arguments at invoke time.
 
-        $this->getServiceLocator()->get('MyInvokableClass')->construct($firstArg, $secondArg, [...]);
+Quick glimpse:
+
+    // syntax
+    $this->getServiceLocator()->get('MyInvokableClass')->construct([$firstArg [, $secondArg [, $...]]]);
 
 
 INSTALLATION:
 -------------
 
-Register FdlConstructInvoker module in application.confic.php  
+Register FdlConstructInvoker module in application.config.php. 
 It is __important__ to note that you need to have the module loaded first __BEFORE__ other modules who uses it!
 
         return array(
           'modules' => array(
               'FdlConstructInvoker', // <<---- Needs to be ontop of Application module
-              'Application',
+              'Application', // I use FdlConstructInvoker so i need to be bellow it!
               ),
           'module_listener_options' => array(
               'module_paths' => array(
@@ -31,9 +35,8 @@ USAGE:
 ------
 
 An example class that you want to register to the service manager.  
-Notice the class requires a $brick instance in its constructor.
+Notice the class requires a `$brick` instance in its constructor.
 
-        // MyClass.php
         namespace class\namespace;
         class Brick
         {
@@ -55,7 +58,7 @@ Notice the class requires a $brick instance in its constructor.
             }
         }
 
-Register your invokable class in your modules using the provided __getConstructInvokerConfig()__ method.
+Register your invokable class in your modules using the provided `getConstructInvokerConfig()` method.
 
         // Module.php of Application module
         public function getConstructInvokerConfig()
@@ -67,8 +70,8 @@ Register your invokable class in your modules using the provided __getConstructI
             );
         }
 
-Now you can access the class anywhere you have the main ServiceManager. For example, inside a controller.
-Take note of the __get('brick')->construct()__ method whick accepts arguments for the constructor.
+Now you can access the class anywhere you have the main ServiceManager. For example, inside a controller.  
+Take note of the `get('brick')->construct()` method whick accepts arguments for the constructor.
 
         // from an action controller
         public function SomeAction()
@@ -101,6 +104,10 @@ UNDER THE HOOD
 --------------
 
 FdlConstructInvoker module uses the Peering Service Manager functionality of the Service Manager.
-Modules who disables this may not be able to do directy:
+Modules who disable this may not be able to do directy below:
 
     $this->getServiceLocator()->get('someclass')->construct()
+
+If this is the case. Use the Construct Invoker Plugin Manager:
+
+    $this->getServiceLocator()->get('constructInvokerConfig')->get('someclass')->construct();
