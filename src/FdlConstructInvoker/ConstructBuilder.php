@@ -35,7 +35,7 @@ class ConstructBuilder
     }
 
     /**
-     * Intantiate the invokable string
+     * Intantiate the invokable class string
      * @param void
      * @return object
      */
@@ -53,9 +53,9 @@ class ConstructBuilder
             extract($evalArgs);
 
             // we can only use eval and hack our way to it :[
-            $args = implode(', $', array_keys($evalArgs));
-            $args = (!empty($args)) ? '$' . $args : '';
-            eval("\$this->invokable = new \$this->invokable($args);");
+            $evalArgs = '$' . implode(', $', array_keys($evalArgs));
+            eval("\$this->invokable = new \$this->invokable($evalArgs);");
+            unset($evalArgs);
         } else {
             $this->invokable = new $this->invokable();
         }
