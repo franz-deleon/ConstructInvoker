@@ -18,6 +18,16 @@ class ConstructBuilder
     }
 
     /**
+     * Reconstruct the object when invoked
+     * @return object Invokable object
+     */
+    public function __invoke()
+    {
+        $args = func_get_args();
+        return call_user_func_array(array($this, 'construct'), $args);
+    }
+
+    /**
      * Forward method calls to our invoked object
      * @param string $name
      * @param string $args
