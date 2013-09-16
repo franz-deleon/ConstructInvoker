@@ -1,5 +1,5 @@
 {
-    "name": "franz-deleon/FdlConstructInvoker",
+    "name": "franz-deleon/fdlconstructinvoker",
     "type": "library",
     "description": "A ZF2 module that enables argument passing to class constructors (__construct()) that requires or not require arguments at construction time.",
     "keywords": ["log","logging"],
