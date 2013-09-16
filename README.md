@@ -2,7 +2,7 @@ FdlConstructInvoker
 ===============
 
 A ZF2 module that enables argument passing to class constructors (`__construct()`) that
-requires or does not require arguments at invoke time.
+requires or not require arguments at construction time.
 
 Quick glimpse:
 
@@ -58,7 +58,7 @@ Notice the class requires a `$brick` instance in its constructor.
             }
         }
 
-Register your invokable class in your modules using the provided `getConstructInvokerConfig()` method.
+Register your invokable classes in your modules using the provided `getConstructInvokerConfig()` method.
 
         // Module.php of Application module
         public function getConstructInvokerConfig()
@@ -83,7 +83,7 @@ Take note of the `get('brick')->construct()` method whick accepts arguments for 
             
             // you can also access through the Construct Invoker plugin manager
             $brick2 = $this->getServiceLocator()
-                           ->get('getConstructInvokerPlugin')
+                           ->get('constructInvokerPlugin')
                            ->get('brick')
                            ->construct('Hollow Blocks');
             echo $brick2->getBrick();
@@ -95,7 +95,7 @@ Take note of the `get('brick')->construct()` method whick accepts arguments for 
             echo $brick->getBrick() // returns "Marbles"
         }
         
-You can also use it for regular invokable classes that are not using constructors
+It will also work for regular invokable classes that are not using constructors:
 
         // pretend SomeClass is registered using getConstructInvokerConfig()
         echo $this->getServiceConfig->get('SomeClass')->someMethod(); // whatever somemethod does...
@@ -110,4 +110,4 @@ Modules who disable this may not be able to do directy below:
 
 If this is the case. Use the Construct Invoker Plugin Manager:
 
-    $this->getServiceLocator()->get('constructInvokerConfig')->get('someclass')->construct();
+    $this->getServiceLocator()->get('constructInvokerPlugin')->get('someclass')->construct();
