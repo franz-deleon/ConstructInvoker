@@ -2,7 +2,13 @@
     "name": "franz-deleon/fdlconstructinvoker",
     "type": "library",
     "description": "A ZF2 module that enables argument passing to class constructors (__construct()) that requires or not require arguments at construction time.",
-    "keywords": ["log","logging"],
+    "keywords": [
+        "zf2",
+        "zf2 constructor",
+        "constructor initialization",
+        "adding constructor arguments",
+        "Zend Framework"
+    ],
     "homepage": "https://github.com/franz-deleon/ConstructInvoker",
     "license": "MIT",
     "authors": [
