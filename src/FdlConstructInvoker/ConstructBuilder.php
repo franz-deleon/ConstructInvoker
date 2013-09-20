@@ -16,6 +16,9 @@ class ConstructBuilder
      */
     protected $pluginServiceManager;
 
+    /**
+     * @var boolean
+     */
     protected $createFromPluginServiceManager = false;
 
     /**
@@ -45,7 +48,11 @@ class ConstructBuilder
         }
     }
 
-
+    /**
+     * The target class to initialize
+     * @param unknown $targetClass
+     * @return \FdlConstructInvoker\ConstructBuilder
+     */
     public function setTargetClass($targetClass)
     {
         $this->targetClass = $targetClass;
@@ -63,12 +70,22 @@ class ConstructBuilder
         return $this;
     }
 
+    /**
+     * Recycle the plugin service manager
+     * @param ServiceManager\ServiceManager $serviceManager
+     * @return \FdlConstructInvoker\ConstructBuilder
+     */
     public function setPluginServiceManager(ServiceManager\ServiceManager $serviceManager)
     {
         $this->pluginServiceManager = $serviceManager;
         return $this;
     }
 
+    /**
+     * Is the tartgetClass being initialized from the PluginManager?
+     * @param boolean $flag
+     * @return \FdlConstructInvoker\ConstructBuilder
+     */
     public function setCreateFromPluginServiceManager($flag)
     {
         $this->createFromPluginServiceManager = (bool) $flag;
@@ -94,6 +111,8 @@ class ConstructBuilder
             } else {
                 $name = uniqid('cb-');
                 $this->setCreateFromPluginServiceManager(false);
+
+                // do the instantiation from the plugin service manager
                 $this->pluginServiceManager->setInvokableClass($name, $this->targetClass);
                 $this->targetClass = $this->pluginServiceManager->get($name, $args);
             }

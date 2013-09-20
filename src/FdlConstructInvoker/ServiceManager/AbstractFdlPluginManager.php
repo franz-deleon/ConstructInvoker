@@ -14,6 +14,9 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
      */
     protected $targetClass;
 
+    /**
+     * @var \FdlConstructInvoker\ConstructBuilder
+     */
     protected $constructBuilder;
 
     /**
@@ -45,6 +48,9 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
         return $instance;
     }
 
+    /**
+     * @return \FdlConstructInvoker\ConstructBuilder
+     */
     public function getConstructBuilder()
     {
         if (null === $this->constructBuilder) {
