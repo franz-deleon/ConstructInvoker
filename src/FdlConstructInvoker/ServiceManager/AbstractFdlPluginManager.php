@@ -9,6 +9,14 @@ use Zend\ServiceManager\Exception;
 abstract class AbstractFdlPluginManager extends AbstractPluginManager
 {
     /**
+     * The target class to initialize
+     * @var string
+     */
+    protected $targetClass;
+
+    protected $constructBuilder;
+
+    /**
      * We override the createFromInvokable method to use our own
      * and delegate the job to builder constructor.
      *
@@ -21,18 +29,39 @@ abstract class AbstractFdlPluginManager extends AbstractPluginManager
     protected function createFromInvokable($canonicalName, $requestedName)
     {
         $invokable = $this->invokableClasses[$canonicalName];
-        if (!class_exists($invokable)) {
-            throw new Exception\ServiceNotFoundException(sprintf(
-                '%s: failed retrieving "%s%s" via invokable class "%s"; class does not exist',
-                get_class($this) . '::' . __FUNCTION__,
-                $canonicalName,
-                ($requestedName ? '(alias: ' . $requestedName . ')' : ''),
-                $invokable
-            ));
+
+        $constructBuilder = $this->getConstructBuilder();
+        $constructBuilder->setTargetClass($invokable);
+
+        if (is_array($this->creationOptions) && !empty($this->creationOptions)) {
+            $constructBuilder->setCreationOptions($this->creationOptions);
+            $instance = $this->construct();
+        } else {
+            $constructBuilder->setPluginServiceManager($this);
+            $constructBuilder->setCreateFromPluginServiceManager(true);
+            $instance = $constructBuilder;
         }
 
-        // Delegate the instantiation of the invokable
-        // This prevents recursion of the service manager
-        return new ConstructBuilder($invokable);
+        return $instance;
+    }
+
+    public function getConstructBuilder()
+    {
+        if (null === $this->constructBuilder) {
+            $this->constructBuilder = $this->getServiceLocator()->get('constructBuilder');
+        }
+        return $this->constructBuilder;
+    }
+
+    /**
+     * Intantiate the invokable class string
+     * @param void
+     * @return object
+     */
+    public function construct()
+    {
+        $constructBuilder = $this->getConstructBuilder();
+        $this->constructBuilder = null;
+        return $constructBuilder->construct();
     }
 }

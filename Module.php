@@ -21,6 +21,18 @@ class Module
         );
     }
 
+    public function getServiceConfig()
+    {
+        return array(
+            'invokables' => array(
+                'constructBuilder' => __NAMESPACE__ . '\ConstructBuilder',
+            ),
+            'shared' =>array(
+                'constructBuilder' => false,
+            ),
+        );
+    }
+
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';

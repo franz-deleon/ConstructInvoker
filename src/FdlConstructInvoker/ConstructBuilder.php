@@ -1,21 +1,22 @@
 <?php
 namespace FdlConstructInvoker;
 
+use Zend\ServiceManager;
+
 class ConstructBuilder
 {
     /**
      * Name of the invokable class
      * @var string
      */
-    protected $invokable;
+    protected $targetClass;
 
     /**
-     * @param string $invokable
+     * @var ServiceManager\ServiceManager
      */
-    public function __construct($invokable)
-    {
-        $this->invokable = $invokable;
-    }
+    protected $pluginServiceManager;
+
+    protected $createFromPluginServiceManager = false;
 
     /**
      * Reconstruct the object when invoked
@@ -34,14 +35,44 @@ class ConstructBuilder
      */
     public function __call($name, $args)
     {
-        if (is_object($this->invokable)) {
-            $callable = array($this->invokable, $name);
+        if (is_object($this->targetClass)) {
+            $callable = array($this->targetClass, $name);
             if (is_callable($callable)) {
                 return call_user_func_array($callable, $args);
             }
         } else {
             return call_user_func_array(array($this->construct(), $name), $args);
         }
+    }
+
+
+    public function setTargetClass($targetClass)
+    {
+        $this->targetClass = $targetClass;
+        return $this;
+    }
+
+    /**
+     * Set the creatioon options overriding it.
+     * @param array $creationOptions
+     * @return \FdlConstructInvoker\ConstructBuilder
+     */
+    public function setCreationOptions(array $creationOptions)
+    {
+        $this->creationOptions = $creationOptions;
+        return $this;
+    }
+
+    public function setPluginServiceManager(ServiceManager\ServiceManager $serviceManager)
+    {
+        $this->pluginServiceManager = $serviceManager;
+        return $this;
+    }
+
+    public function setCreateFromPluginServiceManager($flag)
+    {
+        $this->createFromPluginServiceManager = (bool) $flag;
+        return $this;
     }
 
     /**
@@ -51,25 +82,40 @@ class ConstructBuilder
      */
     public function construct()
     {
-        $args = func_get_args();
-
-        if (!empty($args)) {
-            // convert to string
-            $evalArgs = array();
-            foreach ($args as $key => $arg) {
-                $evalArgs["arg{$key}"] = $arg;
-            }
-            unset($args);
-            extract($evalArgs);
-
-            // we can only use eval and hack our way to it :[
-            $evalArgs = '$' . implode(', $', array_keys($evalArgs));
-            eval("\$this->invokable = new \$this->invokable($evalArgs);");
-            unset($evalArgs);
+        if (!empty($this->creationOptions)) {
+            $args = $this->creationOptions;
         } else {
-            $this->invokable = new $this->invokable();
+            $args = func_get_args();
         }
 
-        return $this->invokable;
+        if ($this->createFromPluginServiceManager) {
+            if (!$this->pluginServiceManager) {
+                throw new Exception\ErrorException('The plugin service manager is missing');
+            } else {
+                $name = uniqid('cb-');
+                $this->setCreateFromPluginServiceManager(false);
+                $this->pluginServiceManager->setInvokableClass($name, $this->targetClass);
+                $this->targetClass = $this->pluginServiceManager->get($name, $args);
+            }
+        } else {
+            if (!empty($args)) {
+                // convert to string
+                $evalArgs = array();
+                foreach ($args as $key => $arg) {
+                    $evalArgs["arg{$key}"] = $arg;
+                }
+                unset($args);
+                extract($evalArgs);
+
+                // we can only use eval and hack our way to it :[
+                $evalArgs = '$' . implode(', $', array_keys($evalArgs));
+                eval("\$this->targetClass = new \$this->targetClass($evalArgs);");
+                unset($evalArgs);
+            } else {
+                $this->targetClass = new $this->targetClass();
+            }
+        }
+
+        return $this->targetClass;
     }
 }
