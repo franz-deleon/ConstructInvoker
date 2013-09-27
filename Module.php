@@ -2,23 +2,40 @@
 namespace FdlConstructInvoker;
 
 use Zend\ServiceManager\ServiceManager;
-
+use Zend\ModuleManager\ModuleEvent;
 use FdlConstructInvoker\ServiceManager\FdlServiceManager;
 
 class Module
 {
     public function init($moduleManager)
     {
-        $listener = $moduleManager->getEvent()
-                                  ->getParam('ServiceManager')
-                                  ->get('ServiceListener');
+        $moduleEvent = $moduleManager->getEvent();
+        $loadedModules = $moduleManager->getLoadedModules();
+        $eventManager = $moduleManager->getEventManager();
+        $listener = $moduleEvent->getParam('ServiceManager')->get('ServiceListener');
 
         $listener->addServiceManager(
             'constructInvokerPlugin',
             'construct_invoker_config',
-            'FdlConstructInvoker\ConstructInvokerPluginProviderInterface',
+            __NAMESPACE__ . '\ConstructInvokerPluginProviderInterface',
             'getConstructInvokerConfig'
         );
+
+        $eventManager->attach(ModuleEvent::EVENT_LOAD_MODULES_POST, function ($e) use ($loadedModules, $listener, $moduleEvent) {
+            foreach ($loadedModules as $moduleName => $module) {
+                if (!method_exists($module, 'getConstructInvokerConfig')) {
+                    continue;
+                }
+
+                if (__NAMESPACE__ == $moduleName) {
+                    break;
+                }
+
+                $listener->onLoadModule($moduleEvent);
+            }
+        });
+
+
     }
 
     public function getServiceConfig()
