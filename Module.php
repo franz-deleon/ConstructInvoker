@@ -1,41 +1,32 @@
 <?php
 namespace FdlConstructInvoker;
 
-use Zend\ServiceManager\ServiceManager;
 use Zend\ModuleManager\ModuleEvent;
-use FdlConstructInvoker\ServiceManager\FdlServiceManager;
 
 class Module
 {
+    protected $pluginParams = array(
+    	'service_manager' => 'constructInvokerPlugin',
+        'config_key'      => 'construct_invoker_config',
+        'interface'       => 'FdlConstructInvoker\ConstructInvokerPluginProviderInterface',
+        'method'          => 'getConstructInvokerConfig'
+    );
+
+    protected $moduleManager;
+    protected $loadedModules;
+
     public function init($moduleManager)
     {
-        $moduleEvent = $moduleManager->getEvent();
-        $loadedModules = $moduleManager->getLoadedModules();
-        $eventManager = $moduleManager->getEventManager();
-        $listener = $moduleEvent->getParam('ServiceManager')->get('ServiceListener');
+        $this->moduleManager = $moduleManager;
+        $this->loadedModules = $moduleManager->getLoadedModules();
 
-        $listener->addServiceManager(
-            'constructInvokerPlugin',
-            'construct_invoker_config',
-            __NAMESPACE__ . '\ConstructInvokerPluginProviderInterface',
-            'getConstructInvokerConfig'
+        $this->addServicePlugin($moduleManager);
+
+        $moduleManager->getEventManager()->attach(
+            ModuleEvent::EVENT_LOAD_MODULES_POST,
+            array($this, 'reloadModule'),
+            1000
         );
-
-        $eventManager->attach(ModuleEvent::EVENT_LOAD_MODULES_POST, function ($e) use ($loadedModules, $listener, $moduleEvent) {
-            foreach ($loadedModules as $moduleName => $module) {
-                if (!method_exists($module, 'getConstructInvokerConfig')) {
-                    continue;
-                }
-
-                if (__NAMESPACE__ == $moduleName) {
-                    break;
-                }
-
-                $listener->onLoadModule($moduleEvent);
-            }
-        });
-
-
     }
 
     public function getServiceConfig()
@@ -63,6 +54,50 @@ class Module
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
             ),
+        );
+    }
+
+    public function reloadModule(ModuleEvent $e)
+    {
+        foreach ($this->loadedModules as $moduleName => $module) {
+            $constructConfigExist = false;
+            if (method_exists($module, 'getConfig')) {
+                $config = $module->getConfig();
+                if (!empty($config[$this->pluginParams['config_key']])) {
+                    $constructConfigExist = true;
+                }
+            }
+
+            if (!method_exists($module, $this->pluginParams['method'])
+                && !$constructConfigExist
+            ) {
+                continue;
+            }
+
+            // the service plugin is already loaded. No need to reload
+            if (__NAMESPACE__ == $moduleName) {
+                break;
+            }
+
+            $this->moduleManager->getEventManager()->trigger(
+                ModuleEvent::EVENT_LOAD_MODULE,
+                $this->moduleManager,
+                $e->setModuleName($moduleName)->setModule($module)
+            );
+        }
+    }
+
+    protected function addServicePlugin($moduleManager)
+    {
+        $listener = $moduleManager->getEvent()
+                                  ->getParam('ServiceManager')
+                                  ->get('ServiceListener');
+
+        $listener->addServiceManager(
+            $this->pluginParams['service_manager'],
+            $this->pluginParams['config_key'],
+            $this->pluginParams['interface'],
+            $this->pluginParams['method']
         );
     }
 }
