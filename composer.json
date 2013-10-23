@@ -20,7 +20,7 @@
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": ">=2.2.0",
-        "franz-deleon/fdlmodulereloader": "dev-master"
+        "franz-deleon/fdl-module-reloader": "dev-master"
     },
     "autoload": {
         "psr-0": {
