@@ -1,5 +1,5 @@
 {
-    "name": "franz-deleon/fdlconstructinvoker",
+    "name": "franz-deleon/fdl-construct-invoker",
     "type": "library",
     "description": "A ZF2 module that enables argument passing to class constructors (__construct()) that requires or not require arguments at construction time.",
     "keywords": [
@@ -19,14 +19,12 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "zendframework/zendframework": ">=2.2.0"
+        "zendframework/zendframework": ">=2.2.0",
+        "franz-deleon/fdlmodulereloader": "dev-master"
     },
     "autoload": {
         "psr-0": {
-            "FdlConstructInvoker": "src/"
-        },
-        "classmap": [
-            "Module.php"
-        ]
+            "FdlConstructInvoker\\": "src/"
+        }
     }
 }

@@ -1,10 +1,7 @@
 <?php
 namespace FdlConstructInvoker\ServiceManager;
 
-use FdlConstructInvoker\ConstructBuilder;
-
 use Zend\ServiceManager\AbstractPluginManager;
-use Zend\ServiceManager\Exception;
 
 abstract class AbstractFdlPluginManager extends AbstractPluginManager
 {

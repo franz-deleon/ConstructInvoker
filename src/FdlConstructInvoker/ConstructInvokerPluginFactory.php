@@ -1,7 +1,6 @@
 <?php
 namespace FdlConstructInvoker;
 
-use FdlConstructInvoker\ServiceManager\FdlServiceManager;
 use Zend\Mvc\Service\AbstractPluginManagerFactory;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
