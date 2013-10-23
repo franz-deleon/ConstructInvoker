@@ -24,6 +24,9 @@
     "autoload": {
         "psr-0": {
             "FdlConstructInvoker\\": "src/"
-        }
+        },
+        "classmap": [
+            "./Module.php"
+        ]
     }
 }

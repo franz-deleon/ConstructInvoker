@@ -38,6 +38,13 @@ class Module
         );
     }
 
+    public function getModuleDependencies()
+    {
+        return array(
+            'FdlModuleReloader',
+        );
+    }
+
     protected function addServicePlugin($moduleManager)
     {
         $serviceManager = $moduleManager->getEvent()->getParam('ServiceManager');
