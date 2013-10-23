@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-0": {
-            "FdlConstructInvoker\\": "src/"
+            "FdlConstructInvoker": "src/"
         },
         "classmap": [
             "./Module.php"
